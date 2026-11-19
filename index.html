@@ -85,7 +85,7 @@
   /* ---------- Hojas (pedido y QR) ---------- */
   .capa { position: fixed; inset: 0; z-index: 20; background: rgba(16,42,67,.5); display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .2s; }
   .capa.abierto { opacity: 1; pointer-events: auto; }
-  .hoja { background: #fff; width: 100%; max-width: var(--ancho); max-height: 92vh; overflow-y: auto; border-radius: 22px 22px 0 0; padding: 10px 20px calc(20px + env(safe-area-inset-bottom)); transform: translateY(30px); transition: transform .25s cubic-bezier(.2,.8,.2,1); }
+  .hoja { background: #fff; width: 100%; max-width: var(--ancho); max-height: 92vh; overflow-y: auto; overscroll-behavior: contain; border-radius: 22px 22px 0 0; padding: 10px 20px calc(20px + env(safe-area-inset-bottom)); transform: translateY(30px); transition: transform .25s cubic-bezier(.2,.8,.2,1); }
   .capa.abierto .hoja { transform: none; }
   .asa { width: 40px; height: 5px; border-radius: 3px; background: var(--linea); margin: 0 auto 14px; }
   .hoja h3 { font-family: var(--display); font-size: 1.4rem; color: var(--mar); margin-bottom: 8px; }
@@ -348,7 +348,11 @@ function observarCategorias() {
   const enlaces = [...document.querySelectorAll("nav a")];
   const marcar = i => enlaces.forEach((a, k) => {
     a.classList.toggle("activa", k === i);
-    if (k === i) a.scrollIntoView({ block: "nearest", inline: "nearest" });
+    if (k === i) {   // mueve solo la barra de categorías hacia los lados, nunca la página
+      const barra = a.parentElement;
+      const izq = a.offsetLeft - (barra.clientWidth - a.offsetWidth) / 2;
+      barra.scrollTo({ left: Math.max(0, izq), behavior: "smooth" });
+    }
   });
   marcar(0);
   if (!("IntersectionObserver" in window)) return;
